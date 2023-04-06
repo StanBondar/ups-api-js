@@ -444,6 +444,8 @@ class UPSApi {
 				}
 			}
 		});
+
+		return data;
 	}
 }
 
