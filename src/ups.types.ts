@@ -7,15 +7,18 @@ export type TUPSClient = {
     access_token: string | null;
     expires_at: number;
   };
-  account_number: string;
-  customer_name: string;
-  shipper_address: TShipperAddress;
-  package_description: string;
-
   authenticate: () => void
-  retrieveRate: (shipment: TRetrieveRateProps & { cartId: string }) => Promise<number>;
-  createShipment: (shipment: TShipmentProps) => Promise<any>;
-  createReturn: (shipment: TShipmentProps) => Promise<any>;
+  retrieveRate: (shipment: TRetrieveRateProps & { cartId: string },
+    shipper_address: TShipperAddress,
+    account_number: string,
+    customer_name: string) => Promise<number>;
+  createShipment: (shipment: TShipmentProps,
+    shipper_address: TShipperAddress,
+    account_number: string,
+    package_description: string) => Promise<any>;
+  createReturn: (shipment: TShipmentProps,
+    shipper_address: TShipperAddress,
+    account_number: string) => Promise<any>;
 }
 
 export type TParcelDimensions = {
@@ -69,12 +72,11 @@ export type TShipperAddress = {
 }
 
 export interface IUPSClientProps {
-  account_number: string;
   client_id: string;
   client_secret: string;
-  customer_name: string;
-  shipper_address: TShipperAddress;
-  package_description: string;
+  account_number?: string;
+  customer_name?: string;
+  package_description?: string;
   isSandbox?: boolean;
 }
 

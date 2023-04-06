@@ -1,7 +1,5 @@
 import axios from 'axios';
 import { TRetrieveRateProps, TShipmentProps, TRate, IUPSClientProps, TShipperAddress, IValidateAddressProps } from './ups.types';
-import { config } from 'dotenv';
-config();
 
 class UPSApi {
 	baseUrl: string;
@@ -12,12 +10,12 @@ class UPSApi {
 		access_token: string | null;
 		expires_at: number;
 	};
-	account_number: string;
-	customer_name: string;
-	shipper_address: TShipperAddress;
-	package_description: string;
 
-	constructor({ client_id, client_secret, isSandbox = false, account_number, customer_name, package_description, shipper_address }: IUPSClientProps) {
+	constructor({
+		client_id,
+		client_secret,
+		isSandbox = false
+	}: IUPSClientProps) {
 		this.baseUrl = isSandbox ? 'https://wwwcie.ups.com' : 'https://onlinetools.ups.com';
 		this.client_id = client_id;
 		this.client_secret = client_secret;
@@ -26,10 +24,6 @@ class UPSApi {
 			access_token: null,
 			expires_at: 0
 		};
-		this.account_number = account_number;
-		this.customer_name = customer_name;
-		this.shipper_address = shipper_address;
-		this.package_description = package_description;
 	}
 
 	async authenticate() {
@@ -57,7 +51,10 @@ class UPSApi {
 		}
 	}
 
-	async retrieveRate(shipment: TRetrieveRateProps & { cartId: string }): Promise<number> {
+	async retrieveRate(shipment: TRetrieveRateProps & { cartId: string },
+		shipper_address: TShipperAddress,
+		account_number: string,
+		customer_name: string): Promise<number> {
 		try {
 			const isTokenAvailable = this.token.access_token && (Date.now() + 500 < this.token.expires_at);
 			if (!isTokenAvailable) {
@@ -94,20 +91,20 @@ class UPSApi {
 				'RateRequest': {
 					'Request': {
 						'TransactionReference': {
-							'CustomerContext': this.customer_name,
+							'CustomerContext': customer_name,
 							'TransactionIdentifier': shipment.cartId
 						}
 					},
 					'Shipment': {
 						'Shipper': {
-							'Name': this.shipper_address.shipper_name,
-							'ShipperNumber': this.account_number,
+							'Name': shipper_address.shipper_name,
+							'ShipperNumber': account_number,
 							'Address': {
-								'AddressLine': this.shipper_address.address_line,
-								'City': this.shipper_address.city,
-								'StateProvinceCode': this.shipper_address.state_province,
-								'PostalCode': this.shipper_address.zip,
-								'CountryCode': this.shipper_address.country_code
+								'AddressLine': shipper_address.address_line,
+								'City': shipper_address.city,
+								'StateProvinceCode': shipper_address.state_province,
+								'PostalCode': shipper_address.zip,
+								'CountryCode': shipper_address.country_code
 							}
 						},
 						'ShipTo': {
@@ -124,20 +121,20 @@ class UPSApi {
 							}
 						},
 						'ShipFrom': {
-							'Name': this.shipper_address.shipper_name,
+							'Name': shipper_address.shipper_name,
 							'Address': {
-								'AddressLine': this.shipper_address.address_line,
-								'City': this.shipper_address.city,
-								'StateProvinceCode': this.shipper_address.state_province,
-								'PostalCode': this.shipper_address.zip,
-								'CountryCode': this.shipper_address.country_code
+								'AddressLine': shipper_address.address_line,
+								'City': shipper_address.city,
+								'StateProvinceCode': shipper_address.state_province,
+								'PostalCode': shipper_address.zip,
+								'CountryCode': shipper_address.country_code
 							}
 						},
 						'PaymentDetails': {
 							'ShipmentCharge': {
 								'Type': '01',
 								'BillShipper': {
-									'AccountNumber': this.account_number,
+									'AccountNumber': account_number,
 								}
 							}
 						},
@@ -168,7 +165,7 @@ class UPSApi {
 		}
 	}
 
-	async createShipment(shipment: TShipmentProps): Promise<any> {
+	async createShipment(shipment: TShipmentProps, shipper_address: TShipperAddress, account_number: string, package_description: string): Promise<any> {
 		try {
 			const isTokenAvailable = this.token.access_token && (Date.now() + 500 < this.token.expires_at);
 			if (!isTokenAvailable) {
@@ -211,16 +208,16 @@ class UPSApi {
 						'RequestOption': 'city'
 					},
 					'Shipment': {
-						'Description': this.package_description,
+						'Description': package_description,
 						'Shipper': {
-							'Name': this.shipper_address.shipper_name,
-							'ShipperNumber': this.account_number,
+							'Name': shipper_address.shipper_name,
+							'ShipperNumber': account_number,
 							'Address': {
-								'AddressLine': this.shipper_address.address_line,
-								'City': this.shipper_address.city,
-								'StateProvinceCode': this.shipper_address.state_province,
-								'PostalCode': this.shipper_address.zip,
-								'CountryCode': this.shipper_address.country_code
+								'AddressLine': shipper_address.address_line,
+								'City': shipper_address.city,
+								'StateProvinceCode': shipper_address.state_province,
+								'PostalCode': shipper_address.zip,
+								'CountryCode': shipper_address.country_code
 							}
 						},
 						'ShipTo': {
@@ -241,20 +238,20 @@ class UPSApi {
 							'Residential': 'true'
 						},
 						'ShipFrom': {
-							'Name': this.shipper_address.shipper_name,
+							'Name': shipper_address.shipper_name,
 							'Address': {
-								'AddressLine': this.shipper_address.address_line,
-								'City': this.shipper_address.city,
-								'StateProvinceCode': this.shipper_address.state_province,
-								'PostalCode': this.shipper_address.zip,
-								'CountryCode': this.shipper_address.country_code
+								'AddressLine': shipper_address.address_line,
+								'City': shipper_address.city,
+								'StateProvinceCode': shipper_address.state_province,
+								'PostalCode': shipper_address.zip,
+								'CountryCode': shipper_address.country_code
 							}
 						},
 						'PaymentInformation': {
 							'ShipmentCharge': {
 								'Type': '01',
 								'BillShipper': {
-									'AccountNumber': this.account_number
+									'AccountNumber': account_number
 								}
 							}
 						},
@@ -295,7 +292,7 @@ class UPSApi {
 		}
 	}
 
-	async createReturn(shipment: TShipmentProps): Promise<any> {
+	async createReturn(shipment: TShipmentProps, shipper_address: TShipperAddress, account_number: string): Promise<any> {
 		try {
 			const isTokenAvailable = this.token.access_token && (Date.now() + 500 < this.token.expires_at);
 			if (!isTokenAvailable) {
@@ -332,8 +329,8 @@ class UPSApi {
 					'Shipment': {
 						'Description': 'Electric chargers',
 						'Shipper': {
-							'Name': this.shipper_address.shipper_name,
-							'ShipperNumber': this.account_number,
+							'Name': shipper_address.shipper_name,
+							'ShipperNumber': account_number,
 							'Address': {
 								'AddressLine': [
 									'1911 SW 31ST AVENUE',
@@ -349,7 +346,7 @@ class UPSApi {
 							'Phone': {
 								'Number': '631-721-8990'
 							},
-							'Name': this.shipper_address.shipper_name,
+							'Name': shipper_address.shipper_name,
 							'Address': {
 								'AddressLine': [
 									'1911 SW 31ST AVENUE',
@@ -379,7 +376,7 @@ class UPSApi {
 							'ShipmentCharge': {
 								'Type': '01',
 								'BillShipper': {
-									'AccountNumber': this.account_number
+									'AccountNumber': account_number
 								}
 							}
 						},
