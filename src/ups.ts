@@ -440,6 +440,11 @@ class UPSApi {
 					'CountryCode': country_code
 				}
 			}
+		}, {
+			headers: {
+				authorization: `Bearer ${this.token.access_token}`,
+				'Content-Type': 'application/json'
+			}
 		});
 
 		return data;
