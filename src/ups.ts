@@ -449,6 +449,24 @@ class UPSApi {
 
 		return data;
 	}
+
+	async trackPackage(trackingNumber: string, transactionId: string): Promise<string> {
+		const isTokenAvailable = this.token.access_token && (Date.now() + 500 < this.token.expires_at);
+		if (!isTokenAvailable) {
+			await this.authenticate();
+		}
+
+		const { data } = await axios.get(`${this.baseUrl}/api/track/v1/details/${trackingNumber}`, {
+			headers: {
+				authorization: `Bearer ${this.token.access_token}`,
+				'Content-Type': 'application/json',
+				transactionSrc: 'uc-ecommerce',
+				transId: transactionId
+			}
+		});
+
+		return data;
+	}
 }
 
 export default UPSApi;
