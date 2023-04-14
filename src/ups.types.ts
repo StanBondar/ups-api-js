@@ -1,3 +1,25 @@
+export type TCreateShipmentResponse = {
+  ShipmentResponse: {
+    ShipmentResults: {
+      PackageResults: {
+        TrackingNumber: string;
+        ShippingLabel: {
+          ImageFormat: {
+            Code: string;
+          }
+          GraphicImage: string;
+        }
+      }[]
+    }
+  },
+  Response: {
+    ResponseStatus: {
+      Code: string;
+      Description: string;
+    }
+  }
+}
+
 export type TUPSClient = {
   baseUrl: string;
   client_id: string;
@@ -15,10 +37,11 @@ export type TUPSClient = {
   createShipment: (shipment: TShipmentProps,
     shipper_address: TShipperAddress,
     account_number: string,
-    package_description: string) => Promise<any>;
+    package_description: string) => Promise<TCreateShipmentResponse>;
   createReturn: (shipment: TShipmentProps,
     shipper_address: TShipperAddress,
     account_number: string) => Promise<any>;
+  trackPackage: (trackingNumber: string, transactionId: string) => Promise<string>
 }
 
 export type TParcelDimensions = {
