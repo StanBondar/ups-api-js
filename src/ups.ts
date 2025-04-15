@@ -233,8 +233,7 @@ class UPSApi {
 		shipment: TShipmentProps,
 		shipper_address: TShipperAddress,
 		account_number: string,
-		package_description: string,
-		display_id: number
+		package_description: string
 	): Promise<any> {
 		try {
 			const isTokenAvailable = this.token.access_token && Date.now() + 500 < this.token.expires_at;
@@ -268,7 +267,7 @@ class UPSApi {
 					},
 				},
 				ReferenceNumber: {
-					Value: `#${display_id}`,
+					Value: `#${shipment.displayId}`,
 				},
 			}));
 
