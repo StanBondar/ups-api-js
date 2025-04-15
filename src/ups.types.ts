@@ -100,6 +100,7 @@ export type TRetrieveRateProps = {
 export type TShipmentProps = TRetrieveRateProps & {
     orderId: string;
     phoneNumber: string;
+    displayId: number;
 };
 
 export type TRate = {
